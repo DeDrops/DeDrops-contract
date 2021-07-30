@@ -36,7 +36,7 @@ async function drop() {
     const tokenAbi = getAbi('./artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json')
     let token = new ethers.Contract(tokenAddress, tokenAbi, accounts[0])
 
-	const dedropsAbi = getAbi('./artifacts/contracts/badland/DeDropsERC.sol/DeDropsERC.json')
+	const dedropsAbi = getAbi('./artifacts/contracts/DeDropsERC.sol/DeDropsERC.json')
     let dedrops = new ethers.Contract(dedropsAddress, dedropsAbi, accounts[0])
 
     await token.connect(accounts[1]).approve(dedrops.address, b(100))
@@ -53,10 +53,10 @@ async function view() {
     const tokenAbi = getAbi('./artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json')
     let token = new ethers.Contract(tokenAddress, tokenAbi, accounts[0])
 
-    const dedropsAbi = getAbi('./artifacts/contracts/badland/DeDropsERC.sol/DeDropsERC.json')
+    const dedropsAbi = getAbi('./artifacts/contracts/DeDropsERC.sol/DeDropsERC.json')
     let dedrops = new ethers.Contract(dedropsAddress, dedropsAbi, accounts[0])
 
-    const bankAbi = getAbi('./artifacts/contracts/badland/Bank20.sol/Bank20.json')
+    const bankAbi = getAbi('./artifacts/contracts/Bank20.sol/Bank20.json')
     let bank = new ethers.Contract(bankAddress, bankAbi, accounts[0])
 
     let item = await drop.idToItem(b(1))

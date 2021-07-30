@@ -32,7 +32,7 @@ async function main() {
 async function mint() {
 	const accounts = await hre.ethers.getSigners()
 
-	const dedropsAbi = getAbi('./artifacts/contracts/badland/DeDropsNFT.sol/DeDropsNFT.json')
+	const dedropsAbi = getAbi('./artifacts/contracts/DeDropsNFT.sol/DeDropsNFT.json')
     let dedrops = new ethers.Contract(dedropsAddress, dedropsAbi, accounts[0])
 
 	await dedrops.connect(accounts[1]).mint(b(100), '测试第一批NFT', '谁都可以来领')
@@ -43,21 +43,65 @@ async function mint() {
 async function view() {
 	const accounts = await hre.ethers.getSigners()
 
-	const dedropsAbi = getAbi('./artifacts/contracts/badland/DeDropsNFT.sol/DeDropsNFT.json')
-    let dedrops = new ethers.Contract(dedropsAddress, dedropsAbi, accounts[0])
+	const dedropsAbi = getAbi('./artifacts/contracts/DeDropsNFT.sol/DeDropsNFT.json')
+    let dedrops = new ethers.Contract(dedropsAddress, dedropsAbi, accounts[1])
 
-	const bankAbi = getAbi('./artifacts/contracts/badland/Bank1155.sol/Bank1155.json')
-    let bank = new ethers.Contract(bankAddress, bankAbi, accounts[0])
+	const bankAbi = getAbi('./artifacts/contracts/Bank1155.sol/Bank1155.json')
+    let bank = new ethers.Contract(bankAddress, bankAbi, accounts[1])
 
-	let item = await dedrops.idToItem(b(1))
+	let item = await dedrops.idToItem(b(4))
 	console.log('id', n(item.id))
 	console.log('info', item.info)
 	console.log('info2', item.info2)
 
-	console.log('bank nft1:', n(await dedrops.balanceOf(bank.address, b(1))))
+	console.log('bank nft:', n(await dedrops.balanceOf(bank.address, b(4))))
+	console.log('account nft:', n(await dedrops.balanceOf(accounts[1].address, b(4))))
 
-	let amount = n(await bank.tokenUserBalance(dedropsAddress, b(1), accounts[0].address))
+	let amount = n(await bank.tokenUserBalance(dedropsAddress, b(4), accounts[0].address))
 	console.log('nft amount:', amount)
+}
+
+
+async function signAndClaim() {
+	const accounts = await hre.ethers.getSigners()
+
+	const dedropsAbi = getAbi('./artifacts/contracts/DeDropsNFT.sol/DeDropsNFT.json')
+    let dedrops = new ethers.Contract(dedropsAddress, dedropsAbi, accounts[0])
+
+	const bankAbi = getAbi('./artifacts/contracts/Bank1155.sol/Bank1155.json')
+    let bank = new ethers.Contract(bankAddress, bankAbi, accounts[0])
+
+	let owner = accounts[0].address
+	let spender = accounts[1].address
+	let deadline = b(parseInt(Date.now() / 1000) + 86400)
+	let id = b(4)
+
+	let digest = utils.keccak256(
+		utils.solidityPack(
+			['bytes1', 'bytes1', 'bytes32', 'bytes32'],
+			[
+				'0x19',
+				'0x01',
+				DOMAIN_SEPARATOR,
+				utils.keccak256(
+					utils.defaultAbiCoder.encode(
+						['bytes32', 'address', 'uint256', 'address', 'address', 'uint256'],
+						[CLAIM_TYPEHASH, dedrops.address, id, owner, spender, deadline]
+					)
+				)
+			]
+		)
+	)
+		
+	let privateKey = '0x' + process.env.DEDROPS_PK;
+	let signingKey = new ethers.utils.SigningKey(privateKey)
+	let sign = signingKey.signDigest(digest)
+	vrs = utils.splitSignature(sign)
+	console.log(vrs)
+
+	await bank.connect(accounts[1]).claim(dedrops.address, id, owner, spender, deadline
+		, vrs.v, vrs.r, vrs.s, {gasLimit:BigNumber.from('8000000')})
+	console.log('claim done')
 }
 
 
@@ -89,7 +133,7 @@ async function delay(sec) {
 	})
 }
 
-main()
+view()
 	.then(() => process.exit(0))
 	.catch(error => {
 		console.error(error);

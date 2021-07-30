@@ -30,7 +30,7 @@ async function deposit() {
 	const tokenAbi = getAbi('./artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json')
     let token = new ethers.Contract(tokenAddress, tokenAbi, accounts[0])
 
-	const bankAbi = getAbi('./artifacts/contracts/badland/Bank20.sol/Bank20.json')
+	const bankAbi = getAbi('./artifacts/contracts/Bank20.sol/Bank20.json')
     let bank = new ethers.Contract(bankAddress, bankAbi, accounts[0])
 
 	await token.approve(bank.address, m(1), {gasLimit:b('8000000')})
@@ -44,7 +44,7 @@ async function deposit() {
 async function view() {
 	const accounts = await hre.ethers.getSigners()
 
-	const bankAbi = getAbi('./artifacts/contracts/badland/Bank20.sol/Bank20.json')
+	const bankAbi = getAbi('./artifacts/contracts/Bank20.sol/Bank20.json')
     let bank = new ethers.Contract(bankAddress, bankAbi, accounts[0])
 
 	DOMAIN_SEPARATOR = await bank.DOMAIN_SEPARATOR()
@@ -103,7 +103,7 @@ async function signClaim() {
 async function claim() {
 	const accounts = await hre.ethers.getSigners()
 
-	const bankAbi = getAbi('./artifacts/contracts/badland/Bank20.sol/Bank20.json')
+	const bankAbi = getAbi('./artifacts/contracts/Bank20.sol/Bank20.json')
     let bank = new ethers.Contract(bankAddress, bankAbi, accounts[0])
 
 	let holder = accounts[0].address
@@ -167,7 +167,7 @@ async function signPassword() {
 async function password() {
 	const accounts = await hre.ethers.getSigners()
 
-	const bankAbi = getAbi('./artifacts/contracts/badland/Bank20.sol/Bank20.json')
+	const bankAbi = getAbi('./artifacts/contracts/Bank20.sol/Bank20.json')
     let bank = new ethers.Contract(bankAddress, bankAbi, accounts[0])
 
 	let holder = accounts[0].address
@@ -188,7 +188,7 @@ async function password() {
 async function withdraw() {
 	const accounts = await hre.ethers.getSigners()
 
-	const bankAbi = getAbi('./artifacts/contracts/badland/Bank20.sol/Bank20.json')
+	const bankAbi = getAbi('./artifacts/contracts/Bank20.sol/Bank20.json')
     let bank = new ethers.Contract(bankAddress, bankAbi, accounts[0])
 
 	let balance = await bank.tokenUserBalance(tokenAddress, accounts[0].address)
