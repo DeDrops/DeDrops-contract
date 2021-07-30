@@ -9,9 +9,8 @@ describe('drop-erc-test', function () {
     let CLAIM_TYPEHASH = ''
     let PASSWORD_TYPEHASH = ''
     let accounts
-	let drop
+	let dedrops
 	let erc
-    let id = b(1)
 	let bank
 	let deadline
     let vrs
@@ -35,12 +34,13 @@ describe('drop-erc-test', function () {
         DOMAIN_SEPARATOR = await bank.DOMAIN_SEPARATOR()
         CLAIM_TYPEHASH = await bank.CLAIM_TYPEHASH()
         PASSWORD_TYPEHASH = await bank.PASSWORD_TYPEHASH()
-		console.log('Bank20 deployed to:', bank.address, 'DOMAIN_SEPARATOR:', DOMAIN_SEPARATOR, 'CLAIM_TYPEHASH:', CLAIM_TYPEHASH, 'PASSWORD_TYPEHASH:', PASSWORD_TYPEHASH)
+		console.log('Bank20 deployed to:', bank.address, 'DOMAIN_SEPARATOR:'
+            , DOMAIN_SEPARATOR, 'CLAIM_TYPEHASH:', CLAIM_TYPEHASH, 'PASSWORD_TYPEHASH:', PASSWORD_TYPEHASH)
 		
 		const DeDropsERC = await ethers.getContractFactory('DeDropsERC')
-		drop = await DeDropsERC.deploy(bank.address)
-		await drop.deployed()
-		console.log('DeDropsERC deployed to:', drop.address)
+		dedrops = await DeDropsERC.deploy(bank.address)
+		await dedrops.deployed()
+		console.log('DeDropsERC deployed to:', dedrops.address)
 
         const ERC = await ethers.getContractFactory('MockERC20', accounts[1])
 		erc = await ERC.deploy('TEST', m(10000), 18)
@@ -51,13 +51,19 @@ describe('drop-erc-test', function () {
 	})
 
 	it('drop', async function () {
-        await erc.approve(drop.address, m(100))
+        await erc.approve(dedrops.address, m(100))
         console.log('approve done')
 
-        let startTime = b(parseInt(Date.now() / 1000))
-        let endTime = startTime.add(86400)
-        await drop.connect(accounts[1]).drop(erc.address, m(100), '测试空投', startTime, endTime, b(100), '测试的空投，有问题联系DeDrops.xyz')
-        console.log('approve done')
+        let info = '比特币BTC：全部靠矿机挖出，每4年产量减半。因为刚开始那2年没什么人关注，只有中本聪自己在挖，所以他挖了400多万枚（总量2100万），占比不小，但是他至今一个币没卖，简直是神人，没人知道他是谁。BTC的市值占整个加密货币里面一半以上，每个涨跌都牵系着整个币圈的震荡。现在越来越多的人把BTC当作数字黄金，而不是货币，因为货币是一直贬值，黄金一直增值。说到比特币，不得不提挖矿，虽然很耗电，但是这是一种公平的发行方式，股票不可能因为你经常买这家公司的产品，而送你股票，即使你给这家公司打工，股票也会酌情给老员工，而且只给一丢丢。挖矿就不一样了，参与者都有BTC奖励，可以快速聚拢起矿工社群，大矿工比如宝二爷，会去推广，让越来越多的人参与进来，人多了，就有了价值。'
+        let info2 = '以太坊ETH：ETH对币圈的影响太深远了，今天的BTC是精神图腾的存在，ETH是大半个加密世界的基础设施。BTC在转账的时候，可以加一段备注，后来发展为可以发一段简单的程序代码，这个就是智能合约的雏形。ETH对这项功能进行了重新设计，使得图灵完备，即可以实现复杂的程序，而且ETH的挖矿算法也改进到了极致，速度快，抗asic，刚好在LTC被asic化之后，简直就是显卡矿工之家，直到今天也是显卡挖矿第一选择。未来会转POS，即淘汰POW矿机挖矿，把ETH抵押给节点就能挖出ETH，如果你怕节点跑路，那最好你自己运行一个节点（服务器），由此来去中心化，这个是技术发展的必然，因为POS的速度更快（快100倍以上），可以容纳更多的应用，以及更好的稳定币价，还省电。ETH已经建立了庞大的社群，矿工人数占比不高了，如今DEFI成为ETH新的发动机，让更多生态进来是ETH的挑战，制约生态的正是POW挖矿的性能瓶颈和高昂手续费，也因此价值溢出让BSC、polygon等EVM公链崛起，所以POS是未来的方向。'
+        await dedrops.connect(accounts[1]).drop(erc.address, m(100), info, info2)
+        console.log('drop done')
+
+        let item = await dedrops.idToItem(b(1))
+        console.log('id', n(item.id))
+        console.log('token', item.token)
+        console.log('info', item.info)
+        console.log('info2', item.info2)
 
         await print()
     })

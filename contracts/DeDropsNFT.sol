@@ -11,19 +11,17 @@ import './Bank1155.sol';
 contract DeDropsNFT is ERC1155('dedrops.xyz'), Ownable {
 
     uint256 public length = 0;
-
     Bank1155 public bank;
 
-    struct NFT {
+    event Drop(uint indexed id, uint256 amount, string info, string info2);
+
+    struct Item {
         uint256 id;
-        string name;
-        string url;
-        uint256 amount;
         string info;
         string info2;
     }
 
-    mapping (uint256 => NFT) public idToNFT;
+    mapping (uint256 => Item) public idToItem;
 
 
     constructor(address bankAddress) public {
@@ -31,13 +29,15 @@ contract DeDropsNFT is ERC1155('dedrops.xyz'), Ownable {
     }
 
 
-    function mint(string calldata name, string calldata url, uint256 amount, string calldata info, string calldata info2) external {
+    function mint(uint256 amount, string calldata info, string calldata info2) external {
         uint256 id = ++length;
-        idToNFT[id] = NFT(id, name, url, amount, info, info2);
+        idToItem[id] = Item(id, info, info2);
 
         _mint(msg.sender, id, amount, '');
         setApprovalForAll(address(bank), true);
         safeTransferFrom(msg.sender, address(bank), id, amount, addressToBytes(owner()));
+
+        emit Drop(id, amount, info, info2);
     }
 
 

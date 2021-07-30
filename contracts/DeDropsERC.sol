@@ -10,21 +10,18 @@ import './Bank20.sol';
 contract DeDropsERC is Ownable {
 
     uint256 public length = 0;
-
     Bank20 public bank;
 
-    struct Drop {
+    event Drop(address indexed token, uint256 amount, string info, string info2);
+
+    struct Item {
         uint256 id;
         address token;
-        uint256 amount;
-        string title;
-        uint256 startTime;
-        uint256 endTime;
-        uint256 claimNum;
         string info;
+        string info2;
     }
 
-    mapping (uint256 => Drop) public idToDrop;
+    mapping (uint256 => Item) public idToItem;
 
 
     constructor(address bankAddress) public {
@@ -32,12 +29,14 @@ contract DeDropsERC is Ownable {
     }
 
 
-    function drop(address token, uint256 amount, string calldata title, uint256 startTime, uint256 endTime, uint256 claimNum, string calldata info) external {
+    function drop(address token, uint256 amount, string calldata info, string calldata info2) external {
         uint256 id = ++length;
-        idToDrop[id] = Drop(id, token, amount, title, startTime, endTime, claimNum, info);
+        idToItem[id] = Item(id, token, info, info2);
 
         IERC20(token).transferFrom(msg.sender, address(this), amount);
         IERC20(token).approve(address(bank), amount);
         bank.deposit(token, owner(), amount);
+
+        emit Drop(token, amount, info, info2);
     }
 }

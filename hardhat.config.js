@@ -74,7 +74,8 @@ module.exports = {
 		},
 		matic_mainnet: {
 			// url: 'https://rpc-mainnet.maticvigil.com/v1/6ca36da1323f40dc42d64ed9ba89da9a6f59c23d',
-			url: 'https://rpc-mainnet.matic.network',
+			// url: 'https://rpc-mainnet.matic.network',
+			url: 'https://matic-mainnet.chainstacklabs.com',
 			chainId: 137,
 			from: process.env.DEDROPS_SERVER,
 			accounts: [

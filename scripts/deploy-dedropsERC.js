@@ -9,7 +9,7 @@ var bankAddress = '0x13d6f4529c2a003f14cde0a356cee66637cd739a'
 var DOMAIN_SEPARATOR = '0x3b4ce86ee8d7aab11e1f2deedfa185c8268cc4b1061ee70f69e020328fff4ac1'
 var CLAIM_TYPEHASH = '0xa05335bcb0b0413b06aebf7578cda47f15e56bda72a634ee823fc1ef42ec1994'
 var PASSWORD_TYPEHASH = '0x3dce4743a9c307489689d5a78849d8466d3d3fa3806e2e97961cead248e9a34b'
-var dropAddress = '0x89071e124A10C0C91e87Ba6Fb17CBDA468DC1340'
+var dedropsAddress = '0xF2F2ed5f790f33e33f48D0e33addb33B002Ab4DF'
 
 
 async function main() {
@@ -24,9 +24,9 @@ async function main() {
     // console.log('Claim deployed to:', bank.address, 'DOMAIN_SEPARATOR:', DOMAIN_SEPARATOR, 'CLAIM_TYPEHASH:', CLAIM_TYPEHASH, 'PASSWORD_TYPEHASH:', PASSWORD_TYPEHASH)
 
     const DeDropsERC = await ethers.getContractFactory('DeDropsERC')
-    let drop = await DeDropsERC.deploy(bankAddress)
-    await drop.deployed()
-    console.log('DeDropsERC deployed to:', drop.address)
+    let dedrops = await DeDropsERC.deploy(bankAddress)
+    await dedrops.deployed()
+    console.log('DeDropsERC deployed to:', dedrops.address)
 }
 
 
@@ -36,16 +36,13 @@ async function drop() {
     const tokenAbi = getAbi('./artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json')
     let token = new ethers.Contract(tokenAddress, tokenAbi, accounts[0])
 
-	const dropAbi = getAbi('./artifacts/contracts/badland/DeDropsERC.sol/DeDropsERC.json')
-    let drop = new ethers.Contract(dropAddress, dropAbi, accounts[0])
+	const dedropsAbi = getAbi('./artifacts/contracts/badland/DeDropsERC.sol/DeDropsERC.json')
+    let dedrops = new ethers.Contract(dedropsAddress, dedropsAbi, accounts[0])
 
-    // await token.connect(accounts[1]).approve(drop.address, b(100))
-    // console.log('approve done')
+    await token.connect(accounts[1]).approve(dedrops.address, b(100))
+    console.log('approve done')
 
-    let startTime = b(parseInt(Date.now() / 1000))
-    let endTime = startTime.add(86400)
-    await drop.connect(accounts[1]).drop(token.address, b(100), '测试空投', startTime
-        , endTime, b(100), '测试的空投，有问题联系DeDrops.xyz', {gasLimit:BigNumber.from('8000000')})
+    await dedrops.connect(accounts[1]).drop(token.address, b(100), '测试空投', '测试的空投，有问题联系DeDrops.xyz', {gasLimit:BigNumber.from('8000000')})
     console.log('drop done')
 }
 
@@ -56,21 +53,17 @@ async function view() {
     const tokenAbi = getAbi('./artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json')
     let token = new ethers.Contract(tokenAddress, tokenAbi, accounts[0])
 
-    const dropAbi = getAbi('./artifacts/contracts/badland/DeDropsERC.sol/DeDropsERC.json')
-    let drop = new ethers.Contract(dropAddress, dropAbi, accounts[0])
+    const dedropsAbi = getAbi('./artifacts/contracts/badland/DeDropsERC.sol/DeDropsERC.json')
+    let dedrops = new ethers.Contract(dedropsAddress, dedropsAbi, accounts[0])
 
     const bankAbi = getAbi('./artifacts/contracts/badland/Bank20.sol/Bank20.json')
     let bank = new ethers.Contract(bankAddress, bankAbi, accounts[0])
 
-    let info = await drop.idToDrop(b(1))
-    console.log('id', n(info.id))
-    console.log('token', info.token)
-    console.log('amount', n(info.amount))
-    console.log('title', info.title)
-    console.log('startTime', n(info.startTime))
-    console.log('endTime', n(info.endTime))
-    console.log('claimNum', n(info.claimNum))
-    console.log('info', info.info)
+    let item = await drop.idToItem(b(1))
+    console.log('id', n(item.id))
+    console.log('token', item.token)
+    console.log('info', item.info)
+    console.log('info2', item.info2)
 
     console.log('bank balance:', n(await token.balanceOf(bank.address)))
 
@@ -107,7 +100,7 @@ async function delay(sec) {
     })
 }
 
-view()
+main()
     .then(() => process.exit(0))
     .catch(error => {
         console.error(error);
