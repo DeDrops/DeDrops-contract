@@ -1,0 +1,145 @@
+const { expect, assert } = require('chai')
+const { BigNumber, utils} = require('ethers')
+const fs = require('fs')
+const hre = require('hardhat')
+
+
+describe('drop-erc-test', function () {
+    let DOMAIN_SEPARATOR = ''
+    let CLAIM_TYPEHASH = ''
+    let PASSWORD_TYPEHASH = ''
+    let accounts
+	let drop
+	let erc
+    let id = b(1)
+	let bank
+	let deadline
+    let vrs
+    let owner
+    let spender
+    let chainId
+    let value = m(1)
+
+	before(async function () {
+		accounts = await ethers.getSigners()
+        
+		console.log('account 0', accounts[0].address)
+		console.log('account 1', accounts[1].address)
+		console.log('account 2', accounts[2].address)
+	})
+	
+	it('deploy', async function () {
+		const Bank20 = await ethers.getContractFactory('Bank20')
+		bank = await Bank20.deploy()
+		await bank.deployed()
+        DOMAIN_SEPARATOR = await bank.DOMAIN_SEPARATOR()
+        CLAIM_TYPEHASH = await bank.CLAIM_TYPEHASH()
+        PASSWORD_TYPEHASH = await bank.PASSWORD_TYPEHASH()
+		console.log('Bank20 deployed to:', bank.address, 'DOMAIN_SEPARATOR:', DOMAIN_SEPARATOR, 'CLAIM_TYPEHASH:', CLAIM_TYPEHASH, 'PASSWORD_TYPEHASH:', PASSWORD_TYPEHASH)
+		
+		const DeDropsERC = await ethers.getContractFactory('DeDropsERC')
+		drop = await DeDropsERC.deploy(bank.address)
+		await drop.deployed()
+		console.log('DeDropsERC deployed to:', drop.address)
+
+        const ERC = await ethers.getContractFactory('MockERC20', accounts[1])
+		erc = await ERC.deploy('TEST', m(10000), 18)
+		await erc.deployed()
+		console.log('ERC deployed to:', erc.address)
+
+        await print()
+	})
+
+	it('drop', async function () {
+        await erc.approve(drop.address, m(100))
+        console.log('approve done')
+
+        let startTime = b(parseInt(Date.now() / 1000))
+        let endTime = startTime.add(86400)
+        await drop.connect(accounts[1]).drop(erc.address, m(100), '测试空投', startTime, endTime, b(100), '测试的空投，有问题联系DeDrops.xyz')
+        console.log('approve done')
+
+        await print()
+    })
+
+	it('sign claim', async function () {
+        owner = accounts[0].address
+        spender = accounts[1].address
+        deadline = b(parseInt(Date.now() / 1000) + 86400)
+        chainId = accounts[0].provider._network.chainId
+    
+        let digest = utils.keccak256(
+            utils.solidityPack(
+                ['bytes1', 'bytes1', 'bytes32', 'bytes32'],
+                [
+                    '0x19',
+                    '0x01',
+                    DOMAIN_SEPARATOR,
+                    utils.keccak256(
+                        utils.defaultAbiCoder.encode(
+                            ['bytes32', 'address', 'address', 'address', 'uint256', 'uint256'],
+                            [CLAIM_TYPEHASH, erc.address, owner, spender, value, deadline]
+                        )
+                    )
+                ]
+            )
+        )
+            
+        let privateKey = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80' //account0 pk
+        let signingKey = new ethers.utils.SigningKey(privateKey)
+        let sign = signingKey.signDigest(digest)
+        vrs = utils.splitSignature(sign)
+        console.log(vrs)
+	})
+
+    it('claim', async function () {
+        await bank.connect(accounts[1]).claim(erc.address, owner, spender, value, deadline
+            , vrs.v, vrs.r, vrs.s, {gasLimit:BigNumber.from('8000000')})
+        console.log('claim')
+        
+        await print()
+    })
+
+    async function print() {
+        console.log('')
+
+        console.log('account0 erc:', d(await erc.balanceOf(accounts[0].address)))
+        console.log('account1 erc:', d(await erc.balanceOf(accounts[1].address)))
+        console.log('account2 erc:', d(await erc.balanceOf(accounts[2].address)))
+        console.log('bank erc:', d(await erc.balanceOf(bank.address)))
+
+        let amount = d(await bank.tokenUserBalance(erc.address, accounts[0].address))
+	    console.log('account0  erc in bank:', amount)
+        amount = d(await bank.tokenUserBalance(erc.address, accounts[1].address))
+	    console.log('account1  erc in bank:', amount)
+
+        console.log('')
+	}
+
+
+	function getAbi(jsonPath) {
+		let file = fs.readFileSync(jsonPath)
+		let abi = JSON.parse(file.toString()).abi
+		return abi
+	}
+
+	function m(num) {
+		return BigNumber.from('1000000000000000000').mul(num)
+	}
+
+	function d(bn) {
+		return bn.div('1000000000000000').toNumber() / 1000
+	}
+
+	function b(num) {
+		return BigNumber.from(num)
+	}
+
+	function n(bn) {
+		return bn.toNumber()
+	}
+
+	function s(bn) {
+		return bn.toString()
+	}
+})
