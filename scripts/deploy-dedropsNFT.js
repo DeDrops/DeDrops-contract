@@ -8,7 +8,8 @@ var bankAddress = '0xc44dc52e259352B6C26AfFcEf9ce280836AD6860'
 var DOMAIN_SEPARATOR = '0xa88c15decb7b31a157043f3cd4b8d44025fab8127a1ace79a4e42f4b4705550c'
 var CLAIM_TYPEHASH = '0xb6a24ef5c5f68d9d0b21ed8a8f65af560e5c67ed6271d8c36130e21b56be877e'
 var PASSWORD_TYPEHASH = '0x892bed353848c2d77daa7dec64601cc101e9d4dabd543a881719f8f210924128'
-var dedropsAddress = '0xa96e19Fd3342a52eff889EF729a81ba1Ed8a60E0'
+// var dedropsAddress = '0xa96e19Fd3342a52eff889EF729a81ba1Ed8a60E0' //old
+var dedropsAddress = '0xA93a1B78Fb909073BD721FCb5892CDCe067A612C'
 
 
 async function main() {
@@ -51,6 +52,7 @@ async function view() {
 
 	let item = await dedrops.idToItem(b(4))
 	console.log('id', n(item.id))
+	console.log('amount', n(item.amount))
 	console.log('info', item.info)
 	console.log('info2', item.info2)
 
@@ -127,13 +129,17 @@ function n(bn) {
 	return bn.toNumber()
 }
 
+function s(bn) {
+	return bn.toString()
+}
+
 async function delay(sec) {
 	return new Promise((resolve, reject) => {
 		setTimeout(resolve, sec * 1000);
 	})
 }
 
-view()
+main()
 	.then(() => process.exit(0))
 	.catch(error => {
 		console.error(error);

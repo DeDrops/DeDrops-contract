@@ -9,7 +9,8 @@ var bankAddress = '0x13d6f4529c2a003f14cde0a356cee66637cd739a'
 var DOMAIN_SEPARATOR = '0x3b4ce86ee8d7aab11e1f2deedfa185c8268cc4b1061ee70f69e020328fff4ac1'
 var CLAIM_TYPEHASH = '0xa05335bcb0b0413b06aebf7578cda47f15e56bda72a634ee823fc1ef42ec1994'
 var PASSWORD_TYPEHASH = '0x3dce4743a9c307489689d5a78849d8466d3d3fa3806e2e97961cead248e9a34b'
-var dedropsAddress = '0xF2F2ed5f790f33e33f48D0e33addb33B002Ab4DF'
+// var dedropsAddress = '0xF2F2ed5f790f33e33f48D0e33addb33B002Ab4DF' //old
+var dedropsAddress = '0x793102D329aAaC0BC990DEABD68Af5a422C53Ef7'
 
 
 async function main() {
@@ -62,12 +63,13 @@ async function view() {
     let item = await drop.idToItem(b(1))
     console.log('id', n(item.id))
     console.log('token', item.token)
+    console.log('amount', s(item.amount))
     console.log('info', item.info)
     console.log('info2', item.info2)
 
-    console.log('bank balance:', n(await token.balanceOf(bank.address)))
+    console.log('bank balance:', s(await token.balanceOf(bank.address)))
 
-    let amount = n(await bank.tokenUserBalance(tokenAddress, accounts[0].address))
+    let amount = s(await bank.tokenUserBalance(tokenAddress, accounts[0].address))
     console.log('account0 balance in bank:', amount)
 }
 
@@ -92,6 +94,10 @@ function b(num) {
 
 function n(bn) {
     return bn.toNumber()
+}
+
+function s(bn) {
+	return bn.toString()
 }
 
 async function delay(sec) {

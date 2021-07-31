@@ -1,5 +1,5 @@
 ## 合约说明
-### DeDropsNFT合约 0xa96e19Fd3342a52eff889EF729a81ba1Ed8a60E0
+### DeDropsNFT合约 0xA93a1B78Fb909073BD721FCb5892CDCe067A612C
 用于铸造NFT并且转入Bank1155合约，每次调用mint可以铸造一批次的NFT，批次id自增
 ### 写入接口 mint
 ### 参数 
@@ -15,6 +15,7 @@
     id  批次id，uint256类型
 ### 返回 
     id      批次id，uint256类型  
+    amount  铸造的数量，uint256类型  
     info    描述，string类型
     info2   描述2，string类型
 <br>
@@ -24,7 +25,7 @@
 <br>
 <br>
 
-### DeDropsERC合约 0xF2F2ed5f790f33e33f48D0e33addb33B002Ab4DF
+### DeDropsERC合约 0x793102D329aAaC0BC990DEABD68Af5a422C53Ef7
 用于接收空投的ERC20token并且转入Bank20合约，并且把空投信息记录上链
 ### 写入接口 drop
 ### 参数 
@@ -47,7 +48,7 @@
     info2   描述2，string类型
 <br>
 
-### 事件 event Drop(address indexed token, uint256 amount, string info, string info2)
+### 事件 event Drop(uint256 indexed id, address indexed token, uint256 amount, string info, string info2)
 调用drop就会发起Drop事件，表示是这批ERC已经投放到Bank20合约，用服务器签名可以领取ERC
 <br>
 <br>
