@@ -12,11 +12,12 @@ contract DeDropsERC is Ownable {
     uint256 public length = 0;
     Bank20 public bank;
 
-    event Drop(address indexed token, uint256 amount, string info, string info2);
+    event Drop(uint256 indexed id, address indexed token, uint256 amount, string info, string info2);
 
     struct Item {
         uint256 id;
         address token;
+        uint256 amount;
         string info;
         string info2;
     }
@@ -31,12 +32,12 @@ contract DeDropsERC is Ownable {
 
     function drop(address token, uint256 amount, string calldata info, string calldata info2) external {
         uint256 id = ++length;
-        idToItem[id] = Item(id, token, info, info2);
+        idToItem[id] = Item(id, token, amount, info, info2);
 
         IERC20(token).transferFrom(msg.sender, address(this), amount);
         IERC20(token).approve(address(bank), amount);
         bank.deposit(token, owner(), amount);
 
-        emit Drop(token, amount, info, info2);
+        emit Drop(id, token, amount, info, info2);
     }
 }

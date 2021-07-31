@@ -62,6 +62,7 @@ describe('drop-erc-test', function () {
         let item = await dedrops.idToItem(b(1))
         console.log('id', n(item.id))
         console.log('token', item.token)
+        console.log('amount', d(item.amount))
         console.log('info', item.info)
         console.log('info2', item.info2)
 

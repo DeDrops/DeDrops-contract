@@ -13,10 +13,11 @@ contract DeDropsNFT is ERC1155('dedrops.xyz'), Ownable {
     uint256 public length = 0;
     Bank1155 public bank;
 
-    event Drop(uint indexed id, uint256 amount, string info, string info2);
+    event Drop(uint256 indexed id, uint256 amount, string info, string info2);
 
     struct Item {
         uint256 id;
+        uint256 amount;
         string info;
         string info2;
     }
@@ -31,20 +32,19 @@ contract DeDropsNFT is ERC1155('dedrops.xyz'), Ownable {
 
     function mint(uint256 amount, string calldata info, string calldata info2) external {
         uint256 id = ++length;
-        idToItem[id] = Item(id, info, info2);
+        idToItem[id] = Item(id, amount, info, info2);
 
         _mint(msg.sender, id, amount, '');
-        setApprovalForAll(address(bank), true);
         safeTransferFrom(msg.sender, address(bank), id, amount, addressToBytes(owner()));
 
         emit Drop(id, amount, info, info2);
     }
 
 
-    function addressToBytes(address addr) internal pure returns (bytes memory){
+    function addressToBytes(address addr) internal pure returns (bytes memory) {
         bytes20 addrBytes = bytes20(uint160(addr));
         bytes memory rtn = new bytes(20);
-        for(uint8 i=0;i<20;i++){
+        for (uint8 i = 0; i < 20; i++) {
             rtn[i] = addrBytes[i];
         }
         return rtn;
