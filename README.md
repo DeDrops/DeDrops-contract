@@ -20,8 +20,13 @@
     info2   描述2，string类型
 <br>
 
-### 事件 event Drop(uint indexed id, uint256 amount, string info, string info2)
-调用mint就会发起Drop事件，表示是这批NFT已经投放到Bank1155合约，用服务器签名可以领取NFT
+### 事件 Drop
+调用mint就会发起Drop事件，表示是这批NFT已经投放到Bank1155合约，用服务器签名可以去Bank1155领取NFT
+### 参数
+    id      批次id，uint256类型，indexed
+    amount  铸造的数量，uint256类型  
+    info    描述，string类型
+    info2   描述2，string类型
 <br>
 <br>
 
@@ -48,8 +53,14 @@
     info2   描述2，string类型
 <br>
 
-### 事件 event Drop(uint256 indexed id, address indexed token, uint256 amount, string info, string info2)
-调用drop就会发起Drop事件，表示是这批ERC已经投放到Bank20合约，用服务器签名可以领取ERC
+### 事件 Drop
+调用drop就会发起Drop事件，表示是这批Token已经投放到Bank20合约，用服务器签名可以去Bank20领取Token
+### 参数
+    id      空投活动id，uint256类型，indexed
+    token   token的合约地址，address类型，indexed
+    amount  数量，uint256类型
+    info    描述，string类型
+    info2   描述2，string类型
 <br>
 <br>
 
