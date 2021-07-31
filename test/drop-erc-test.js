@@ -18,6 +18,7 @@ describe('drop-erc-test', function () {
     let spender
     let chainId
     let value = m(1)
+    let digest
 
 	before(async function () {
 		accounts = await ethers.getSigners()
@@ -75,7 +76,7 @@ describe('drop-erc-test', function () {
         deadline = b(parseInt(Date.now() / 1000) + 86400)
         chainId = accounts[0].provider._network.chainId
     
-        let digest = utils.keccak256(
+        digest = utils.keccak256(
             utils.solidityPack(
                 ['bytes1', 'bytes1', 'bytes32', 'bytes32'],
                 [
@@ -103,6 +104,8 @@ describe('drop-erc-test', function () {
         await bank.connect(accounts[1]).claim(erc.address, owner, spender, value, deadline
             , vrs.v, vrs.r, vrs.s, {gasLimit:BigNumber.from('8000000')})
         console.log('claim')
+
+        console.log('is claim?', digest, await bank.nonces(digest))
         
         await print()
     })

@@ -4,27 +4,26 @@ const { BigNumber, utils } = require('ethers')
 
 
 //matic
-var bankAddress = '0xc44dc52e259352B6C26AfFcEf9ce280836AD6860'
-var DOMAIN_SEPARATOR = '0xa88c15decb7b31a157043f3cd4b8d44025fab8127a1ace79a4e42f4b4705550c'
-var CLAIM_TYPEHASH = '0xb6a24ef5c5f68d9d0b21ed8a8f65af560e5c67ed6271d8c36130e21b56be877e'
-var PASSWORD_TYPEHASH = '0x892bed353848c2d77daa7dec64601cc101e9d4dabd543a881719f8f210924128'
-// var dedropsAddress = '0xa96e19Fd3342a52eff889EF729a81ba1Ed8a60E0' //old
-var dedropsAddress = '0xA93a1B78Fb909073BD721FCb5892CDCe067A612C'
+var bankAddress = '0x9e5f0d1028007DEB7432AF0cF3787B804207A68b'
+var DOMAIN_SEPARATOR = '0xe63847ae1a10cb5676eb4d63bf3205a1a80c2a6f51889434c197583343aaefb0'
+var CLAIM_TYPEHASH = '0x242444289e23ce6db820d71eb5a872b74ab417877a6bc4b88ff9c0c982f42aa8'
+var PASSWORD_TYPEHASH = '0xe1a52c71772aeec2cad9cac0dbd56513ea655223347c5201ca618b6d314300ec'
+var dedropsAddress = '0x72C62fA08b0209e49048C00c896100684e19e887'
 
 
 async function main() {
 	const accounts = await hre.ethers.getSigners()
 
-	// const Bank1155 = await ethers.getContractFactory('Bank1155')
-	// let bank = await Bank1155.deploy()
-	// await bank.deployed()
-	// DOMAIN_SEPARATOR = await bank.DOMAIN_SEPARATOR()
-	// CLAIM_TYPEHASH = await bank.CLAIM_TYPEHASH()
-	// PASSWORD_TYPEHASH = await bank.PASSWORD_TYPEHASH()
-	// console.log('Bank1155 deployed to:', bank.address, 'DOMAIN_SEPARATOR:', DOMAIN_SEPARATOR, 'CLAIM_TYPEHASH:', CLAIM_TYPEHASH, 'PASSWORD_TYPEHASH:', PASSWORD_TYPEHASH)
+	const Bank1155 = await ethers.getContractFactory('Bank1155')
+	let bank = await Bank1155.deploy()
+	await bank.deployed()
+	DOMAIN_SEPARATOR = await bank.DOMAIN_SEPARATOR()
+	CLAIM_TYPEHASH = await bank.CLAIM_TYPEHASH()
+	PASSWORD_TYPEHASH = await bank.PASSWORD_TYPEHASH()
+	console.log('Bank1155 deployed to:', bank.address, 'DOMAIN_SEPARATOR:', DOMAIN_SEPARATOR, 'CLAIM_TYPEHASH:', CLAIM_TYPEHASH, 'PASSWORD_TYPEHASH:', PASSWORD_TYPEHASH)
 	
 	const DeDropsNFT = await ethers.getContractFactory('DeDropsNFT')
-	let dedrops = await DeDropsNFT.deploy(bankAddress)
+	let dedrops = await DeDropsNFT.deploy(bank.address)
 	await dedrops.deployed()
 	console.log('DeDropsNFT deployed to:', dedrops.address)
 }

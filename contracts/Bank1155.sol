@@ -4,6 +4,7 @@ pragma solidity 0.6.12;
 import '@openzeppelin/contracts/token/ERC1155/IERC1155.sol';
 import '@openzeppelin/contracts/token/ERC1155/ERC1155Receiver.sol';
 
+import 'hardhat/console.sol';
 
 contract Bank1155 is ERC1155Receiver {
 
@@ -112,6 +113,7 @@ contract Bank1155 is ERC1155Receiver {
                 keccak256(abi.encode(CLAIM_TYPEHASH, token, id, owner, spender, deadline))
             )
         );
+
         require(!nonces[digest], 'Bank1155::claim: expired digest');
         address recoveredAddress = ecrecover(digest, v, r, s);
         require(recoveredAddress != address(0) && recoveredAddress == owner, 'Bank1155::claim: invalid signature');
@@ -119,6 +121,7 @@ contract Bank1155 is ERC1155Receiver {
         require(tokenUserBalance[token][id][owner] >= 1, 'Bank1155::claim: oh no');
         tokenUserBalance[token][id][owner] = tokenUserBalance[token][id][owner] - 1;
         IERC1155(token).safeTransferFrom(address(this), spender, id, 1, '');
+        nonces[digest] = true;
 
         emit Claim(token, id, owner, spender);
     }
@@ -140,6 +143,7 @@ contract Bank1155 is ERC1155Receiver {
         require(tokenUserBalance[token][id][owner] >= 1, 'Bank1155::claim: oh no');
         tokenUserBalance[token][id][owner] = tokenUserBalance[token][id][owner] - 1;
         IERC1155(token).safeTransferFrom(address(this), msg.sender, id, 1, '');
+        nonces[digest] = true;
 
         emit Password(token, id, owner, msg.sender);
     }

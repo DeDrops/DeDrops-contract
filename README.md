@@ -1,5 +1,5 @@
 ## 合约说明
-### DeDropsNFT合约 0xA93a1B78Fb909073BD721FCb5892CDCe067A612C
+### DeDropsNFT合约 0x72C62fA08b0209e49048C00c896100684e19e887
 用于铸造NFT并且转入Bank1155合约，每次调用mint可以铸造一批次的NFT，批次id自增
 ### 写入接口 mint
 ### 参数 
@@ -64,7 +64,7 @@
 <br>
 <br>
 
-### Bank1155合约 0xc44dc52e259352B6C26AfFcEf9ce280836AD6860
+### Bank1155合约 0x9e5f0d1028007DEB7432AF0cF3787B804207A68b
 用于分发NFT，用户提交签名来领取NFT
 ### 写入接口 claim
 ### 参数 
