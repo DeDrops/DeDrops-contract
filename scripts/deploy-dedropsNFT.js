@@ -49,17 +49,22 @@ async function view() {
 	const bankAbi = getAbi('./artifacts/contracts/Bank1155.sol/Bank1155.json')
     let bank = new ethers.Contract(bankAddress, bankAbi, accounts[1])
 
-	let item = await dedrops.idToItem(b(4))
-	console.log('id', n(item.id))
-	console.log('amount', n(item.amount))
-	console.log('info', item.info)
-	console.log('info2', item.info2)
+	let id = b(1)
 
-	console.log('bank nft:', n(await dedrops.balanceOf(bank.address, b(4))))
-	console.log('account nft:', n(await dedrops.balanceOf(accounts[1].address, b(4))))
+	// let item = await dedrops.idToItem(id)
+	// console.log('id', n(item.id))
+	// console.log('amount', n(item.amount))
+	// console.log('info', item.info)
+	// console.log('info2', item.info2)
 
-	let amount = n(await bank.tokenUserBalance(dedropsAddress, b(4), accounts[0].address))
-	console.log('nft amount:', amount)
+	// console.log('bank nft:', n(await dedrops.balanceOf(bank.address, id)))
+	// console.log('account nft:', n(await dedrops.balanceOf('0x37f88413AADb13d85030EEdC7600e31573BCa3c3', id)))
+
+	// let amount = n(await bank.tokenUserBalance(dedropsAddress, id, accounts[0].address))
+	// console.log('nft amount:', amount)
+
+	let digest = '0x3275d8d1ac8a3ec0126ea87d44a6b07622435271bd84662c8cfbf4e9dcee18c0'
+	console.log('is claim?', digest, await bank.nonces(digest))
 }
 
 
@@ -73,9 +78,10 @@ async function signAndClaim() {
     let bank = new ethers.Contract(bankAddress, bankAbi, accounts[0])
 
 	let owner = accounts[0].address
-	let spender = accounts[1].address
+	// let spender = accounts[1].address
+	let spender = '0x37f88413AADb13d85030EEdC7600e31573BCa3c3'
 	let deadline = b(parseInt(Date.now() / 1000) + 86400)
-	let id = b(4)
+	let id = b(1)
 
 	let digest = utils.keccak256(
 		utils.solidityPack(
@@ -103,6 +109,28 @@ async function signAndClaim() {
 	await bank.connect(accounts[1]).claim(dedrops.address, id, owner, spender, deadline
 		, vrs.v, vrs.r, vrs.s, {gasLimit:BigNumber.from('8000000')})
 	console.log('claim done')
+}
+
+
+async function claim() {
+	const accounts = await hre.ethers.getSigners()
+
+	const bankAbi = getAbi('./artifacts/contracts/Bank1155.sol/Bank1155.json')
+    let bank = new ethers.Contract(bankAddress, bankAbi, accounts[1])
+
+	let token = "0x72C62fA08b0209e49048C00c896100684e19e887"
+	let id = b("1")
+	let owner = "0xFa7577a6198aA77A2F443091D85E6DB5b16bE7a7"
+	let spender = "0x37f88413AADb13d85030EEdC7600e31573BCa3c3"
+	let deadline = b(1627760115102)
+	let v = 28
+	let s = "0x07d2992e7dd31c8eeebb03dc4f850cd1be251e3b6ac3eac23c2e5bf95773f96a"
+	let r = "0xbbf646fa429ecb9898b3bf4a8fbdc05b7c28a8d919b4c26316efd74d23f76041"
+
+	await bank.claim(token, id, owner, spender, deadline , v, r, s, {gasLimit:BigNumber.from('8000000')})
+	console.log('claim done')
+
+	// console.log('is claim?', digest, await bank.nonces(digest))
 }
 
 
@@ -138,7 +166,7 @@ async function delay(sec) {
 	})
 }
 
-main()
+view()
 	.then(() => process.exit(0))
 	.catch(error => {
 		console.error(error);
