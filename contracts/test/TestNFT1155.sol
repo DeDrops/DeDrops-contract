@@ -6,14 +6,33 @@ import '@openzeppelin/contracts/token/ERC1155/ERC1155.sol';
 
 contract TestNFT1155 is ERC1155('TestNFT1155') {
 
+    mapping (uint256 => address) public creator;
+
+    mapping (uint256 => uint256) public totalSupply;
+
+    mapping (uint256 => string) internal _uri;
+
     constructor() public {
     }
 
-    function mint(address account, uint256 id, uint256 amount, bytes memory data) external {
-        _mint(account, id, amount, data);
+    function uri(uint256 id) external view override returns (string memory) {
+        return _uri[id];
     }
 
-    function mintBatch(address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data) external {
-        _mintBatch(to, ids, amounts, data);
+    function exists(uint256 id) public view returns (bool) {
+        return totalSupply[_id] > 0;
     }
+
+    function maxSupply(uint256 id) public view returns (uint256) {
+        return totalSupply[_id];
+    }
+
+    function mint(address account, uint256 id, uint256 amount, string calldata tokenURI) external {
+        _mint(account, id, amount, '');
+        creator[id] = account;
+        totalSupply[id] = amount;
+        _uri[id] = tokenURI;
+    }
+
+    
 }

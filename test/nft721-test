@@ -1,0 +1,80 @@
+const { expect, assert } = require('chai')
+const { BigNumber, utils} = require('ethers')
+const fs = require('fs')
+const hre = require('hardhat')
+
+
+describe('nft721-test', function () {
+    let accounts
+    let nft721
+
+	before(async function () {
+		accounts = await ethers.getSigners()
+        
+		console.log('account 0', accounts[0].address)
+		console.log('account 1', accounts[1].address)
+		console.log('account 2', accounts[2].address)
+	})
+	
+	it('deploy', async function () {
+		const TestNFT721 = await ethers.getContractFactory('TestNFT721')
+		nft721 = await TestNFT721.deploy()
+		await nft721.deployed()
+		console.log('TestNFT721 deployed to:', nft721.address)
+	})
+
+    it('mint', async function () {
+        await nft721.mint(accounts[1].address, b(1))
+        console.log('mint done')
+
+        let tokenJSON = 
+        {
+            "name": "自定义螺蛳粉",
+            "description": "螺蛳粉就是好吃",
+            "image": "https://lh3.googleusercontent.com/voMBqwRcDV8Pfqf56-fkrFO85sRfKWz8yxQSRM93wyivv88a7rl__79s3_g94GtG8XYZju29CftFm0mpMU8mYfZ7MQjJKWlyJ9j0zw=w600",
+            "attributes": ""
+        }
+        
+        await nft721.setTokenURI(b(1), JSON.stringify(tokenJSON))
+        console.log('setTokenURI done')
+
+        await print()
+    })
+
+    async function print() {
+        console.log('')
+
+        console.log('balanceOf', n(await nft721.balanceOf(accounts[1].address)))
+        console.log('ownerOf', await nft721.ownerOf(b(1)))
+        console.log('tokenURI', await nft721.tokenURI(b(1)))
+
+        console.log('')
+	}
+
+
+	function getAbi(jsonPath) {
+		let file = fs.readFileSync(jsonPath)
+		let abi = JSON.parse(file.toString()).abi
+		return abi
+	}
+
+	function m(num) {
+		return BigNumber.from('1000000000000000000').mul(num)
+	}
+
+	function d(bn) {
+		return bn.div('1000000000000000').toNumber() / 1000
+	}
+
+	function b(num) {
+		return BigNumber.from(num)
+	}
+
+	function n(bn) {
+		return bn.toNumber()
+	}
+
+	function s(bn) {
+		return bn.toString()
+	}
+})
